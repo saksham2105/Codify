@@ -1,0 +1,726 @@
+<html>
+<head>
+<title>Codify</title>
+    <style>
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+.tClass{
+    color: white;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey; 
+  border-radius: 10px;
+}
+ 
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #b30000; 
+}
+
+
+.loading {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0,0,0,.5);
+}
+.loading-wheel {
+    width: 20px;
+    height: 20px;
+    margin-top: -40px;
+    margin-left: -40px;
+    
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    
+    border-width: 30px;
+    border-radius: 50%;
+    -webkit-animation: spin 1s linear infinite;
+}
+.style-2 .loading-wheel {
+    border-style: double;
+    border-color: #ccc transparent;
+}
+@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0);
+    }
+    100% {
+        -webkit-transform: rotate(-360deg);
+    }
+}
+
+        #editor{
+            height: 554px;
+            font-size: 15px;
+            width: 750px;
+        }
+        #editorx{
+            height: 340px;
+            font-size: 15px;
+            width: 600px;
+        }
+        .flex-container {
+    display: flex;
+}
+
+.flex-child {
+    flex: 1;
+}  
+
+.flex-child:first-child {
+    margin-right: 1px;
+}
+
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+  var startLoader;
+  var globalDescs=[];
+  var inputRadio="";
+  var testcases=[];
+  var expectedoutput=[];
+  var outputColor="";
+  var output="";
+  var currentProblemTestcase=[];
+  var currentProblemExpectedOutput=[];
+  var currentProblemOutput=[];
+  var submitCodeTransparent;
+  var submitCount=0;
+  var failedTestcases=0;
+  var totalTestcases=0;
+  var selectedProblemId="";
+  
+   function changeInputRadio(val)
+    {
+    if(val=="true") 
+    {
+    document.getElementById("customField").disabled=false;
+    inputRadio=val;
+    }
+    
+    if(val=="false"){
+      document.getElementById("customField").disabled=true;
+      inputRadio=val;
+    } 
+    }
+    function submitForm()
+    {
+    if(editor.getValue().length==0) return false;
+    document.getElementById("code").value=editor.getValue();
+    console.log(document.getElementById("code").value);
+    return true;
+    }
+    function openProblem(problem,i,problemId)
+    {
+      selectedProblemId=problemId;
+      var string="Problem Name : "+problem;
+      string+="\n\n";
+      var dsc="Description : "+globalDescs[i];
+      string+=dsc;
+      editorx.setValue(string,-1);
+      $("#exampleModal").modal("hide");
+      currentProblemTestcase=testcases[i];
+      currentProblemExpectedOutput=expectedoutput[i];
+    }
+
+    function showDivision(i)
+    {
+    $("#exampleModal").modal("hide");
+    document.getElementById("description").innerHTML=globalDescs[i];
+    $("#descriptionModal").modal("show");
+    }
+    function openLeaderboardModal()
+    {
+     var leaderboardArray=[];
+     $.ajax({
+     type:'GET',
+     url:'getAllScore',
+     success:function(res)
+     {
+      var t=document.getElementById("leaderboardTable");
+      t.innerHTML="<thead><tr><th scope='col'>S.No.</th><th scope='col'>UserName</th><th scope='col'>Score</th></tr></thead><tbody>";
+    for(var i=0;i<res.message.length;i++)
+    {
+    t.innerHTML+=`<tr><th scope="row">${i+1}</th><td>${res.message[i].username}</td><td>${res.message[i].score}</td></tr>`;
+    }  
+    t.innerHTML+="</tbody>";
+    },
+     error:function()
+     {
+      alert("error");
+     }
+
+     });
+    $("#leaderboardModal").modal("show");
+    }
+
+    function logout()
+    {
+    var sessionDestroyed=false;
+    var responseMessage="";
+    $.ajax({
+    type:'GET',
+    url:'logout',
+    async:false,
+    success:function(res)
+    {
+    sessionDestroyed=res.success;
+    },
+    error:function(){
+
+    }
+    });
+    if(sessionDestroyed)
+    {
+    window.location="http://localhost:8080/login";
+    return;
+    }
+    else
+    {
+    alert(responseMessage);
+    return;
+    }
+    }
+    function popupModal()
+    {
+      var problems=[];
+    var dscs=[];
+    var pids=[];
+    testcases=[];
+    expectedoutput=[];
+    $.ajax({
+    type:'GET',
+    url:'getProblems',
+    async:false,
+    success:function(res)
+    {
+    for(var i=0;i<res.message.length;i++)
+    {
+    problems.push(res.message[i].name);
+    dscs.push(res.message[i].description);
+    pids.push(res.message[i].pid);
+    testcases.push(res.message[i].testcases);
+    expectedoutput.push(res.message[i].expectedoutput);
+    }
+    },
+    error:function()
+    {
+   alert("Problem");
+    }
+    });
+    globalDescs=dscs;
+    var modalProblemTable=document.getElementById("modalProblemTable");
+    var htmlString="";
+    htmlString+=`<thead class="thead-dark"><tr><th scope="col">Problem</th><th scope="col">Unlock</th><th scope="col">View</th></tr></thead>`;
+    htmlString+=`<tbody>`;
+    for(var i=0;i<problems.length;i++)
+    {
+    htmlString+=`<tr scope="row"><td><b>${problems[i]}</b></td><td><a class="btn btn-info" style="cursor:pointer;" onclick="openProblem('${problems[i]}',${i},'${pids[i]}')"><i class="fa fa-unlock" style="font-size:17px;"></i></a></td><td><a class="btn btn-info" style="cursor:pointer" onclick="showDivision('${i}')"><i class='fa fa-eye' style="font-size:17px;"></i></a></td></tr>`;
+    }
+    htmlString+=`</tbody>`;
+    modalProblemTable.innerHTML=htmlString;
+    $("#exampleModal").modal("show");
+    }
+
+    function stopSubmitTransparency()
+    {
+    submitCount=0;
+    document.getElementById("divToTransparent").removeAttribute("class","loading style-2");
+    document.getElementById("wheelDiv").removeAttribute("class","loading-wheel");
+    clearInterval(submitCodeTransparent);
+    if(failedTestcases==0)
+   {
+    document.getElementById("result").setAttribute("style","color:green;");
+    document.getElementById("result").innerHTML="Success<br/>";
+    document.getElementById("result").innerHTML+=`<div class="progress"><div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"><b>Congrats Your Problem has passed all the testcases</b></div></div>`;
+   }
+   else
+   {
+    let testcasesPassed=totalTestcases-failedTestcases;
+    let testcasesRatio=Math.floor(100/totalTestcases);
+    document.getElementById("result").setAttribute("style","color:red;");
+    document.getElementById("result").innerHTML="Failed<br/>";
+  document.getElementById("result").innerHTML+=`<div class="progress">
+  <div class="progress-bar bg-success" role="progressbar" style="width: ${testcasesRatio*testcasesPassed}%" aria-valuenow="${testcasesRatio*testcasesPassed*2}" aria-valuemin="0" aria-valuemax="100">${testcasesPassed} testcases passed</div>
+  <div class="progress-bar bg-danger" role="progressbar" style="width: ${testcasesRatio*failedTestcases}%" aria-valuenow="${testcasesRatio*failedTestcases}" aria-valuemin="0" aria-valuemax="100">${failedTestcases} testcases failed</div>
+  </div>`;
+
+   }
+
+   var scoreForThisProblem=0;
+   var hasSolved=false;
+    if(failedTestcases==0)
+    {
+    scoreForThisProblem=10;
+    }
+    $.ajax({
+    type:'POST',
+    url:'hasProblemSolvedByUser',
+    async:false,
+    data:{pid:selectedProblemId,username:username},
+    success:function(res){
+    hasSolved=res.success;
+    },
+    error:function(){
+   alert("error");
+    }
+
+    });
+  if(hasSolved)
+  {
+   return;
+  }
+  else
+  {
+    $.ajax({
+    type:'POST',
+    url:'getScore',
+    async:false,
+    data:{username:username},
+    success:function(res){
+      scoreForThisProblem=scoreForThisProblem+parseInt(res.message[0].score);
+      
+    },
+    error:function(){
+    }});
+
+    $.ajax({
+    type:'POST',
+    url:'updateScore',
+    async:false,
+    data:{username:username,score:scoreForThisProblem},
+    success:function(res){
+    },
+    error:function(){
+     alert("Some Problem"); 
+    }});
+
+    $.ajax({
+    type:'POST',
+    url:'updateCheck',
+    async:false,
+    data:{pid:selectedProblemId,username:username,score:10,hasSolved:true},
+    success:function(res)
+    {
+    },
+    error:function(){
+    alert("Error while updating Check");
+    }
+
+    });
+  }
+
+ 
+    }
+
+    function startSubmitTransparency()
+    {
+    if(submitCount==5)
+    {
+      stopSubmitTransparency();
+    return;
+    }
+    submitCount+=1;
+    }
+    function submitCode()
+    {
+      failedTestcases=0;
+      currentProblemOutput=[];
+      var code=editor.getValue();
+    var input=document.getElementById("customField").value;
+    totalTestcases=currentProblemTestcase.length;
+    /*for(var test of currentProblemExpectedOutput)
+    {
+    console.log(JSON.stringify(test));
+    }*/
+      if(currentProblemExpectedOutput.length==0) return;
+      else
+      {
+      for(var test of currentProblemTestcase)
+      {
+      $.ajax({
+      type:'POST',
+      url:'compilecode',
+      async:false,
+      data:{"code":code,"input":test.testcase,"inputRadio":"true","lang":language},
+    success: function(res)
+	  {
+    currentProblemOutput.push(res);
+    },
+    error: function()
+    {
+    alert("error");
+    }
+    });   
+
+
+       }
+
+
+      }
+   var failed=false;
+   var failedMessage="";
+   for(var v of currentProblemOutput)
+   {
+    if(v.error)
+    {
+    failed=true;
+    message=v.error;
+    break;
+    }
+   }
+   if(failed)
+   {
+     document.getElementById("result").setAttribute("style","color:red;");
+    document.getElementById("result").innerHTML=failedMessage;
+    return;
+   }
+   if(currentProblemOutput.length<currentProblemExpectedOutput.length)
+   {
+    failedTestcases=currentProblemExpectedOutput.length-currentProblemOutput.length;
+   }
+   else
+   {
+    
+   for(var f=0;f<currentProblemOutput.length;f++)
+   {
+   var tempActualOutput=currentProblemOutput[f].output;
+   var tempExpectedOutput=currentProblemExpectedOutput[f].output;
+   tempActualOutput=tempActualOutput.replaceAll("\n","");
+   tempActualOutput=tempActualOutput.replaceAll("\r","");
+   tempActualOutput=tempActualOutput.replaceAll(" ","");
+   tempExpectedOutput=tempExpectedOutput.replaceAll("\n","");
+   tempExpectedOutput=tempExpectedOutput.replaceAll("\r","");
+   tempExpectedOutput=tempExpectedOutput.replaceAll(" ","");
+   if(tempExpectedOutput!=tempActualOutput) failedTestcases+=1;
+   }  
+   document.getElementById("divToTransparent").setAttribute("class","loading style-2");
+    document.getElementById("wheelDiv").setAttribute("class","loading-wheel");
+   submitCodeTransparent=setInterval(startSubmitTransparency,800);
+   }
+}
+    function changeTheme(t)
+    {
+    editor.setTheme("ace/theme/"+t);
+    }
+
+    var loadingCount=0;
+    function removeTransparency()
+    {
+    loadingCount=0;
+    document.getElementById("divToTransparent").removeAttribute("class","loading style-2");
+    document.getElementById("wheelDiv").removeAttribute("class","loading-wheel");
+    document.getElementById("stdout").style.color=outputColor;
+    document.getElementById("stdout").value=output;
+    clearInterval(startLoader);
+    }
+    function createTransparency()
+    {
+    if(loadingCount==5) removeTransparency();
+    loadingCount+=1;
+    }
+    function runCode()
+    {
+    var code=editor.getValue();
+    var input=document.getElementById("customField").value;
+    var a=input;
+    a=a.replaceAll("\n"," ");
+    console.log(a);
+    $.ajax({
+    type:'POST',
+    url:"compilecode",
+    data:{"code":code,"input":input,"inputRadio":inputRadio,"lang":language},
+    success: function(res)
+	  {
+    document.getElementById("divToTransparent").setAttribute("class","loading style-2");
+    document.getElementById("wheelDiv").setAttribute("class","loading-wheel");
+    if(res.output) {
+      output=res.output.toString();
+      outputColor="green";
+    }
+    if(res.error)
+    {
+    output=res.error.toString();
+    outputColor="red";
+    }
+    startLoader=setInterval(createTransparency,700);
+    },
+    error: function()
+    {
+    alert("error");
+    }
+    });    
+    }
+</script>
+</head>
+<body onload="changeLanguage()">
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Select a Problem</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="modalForm" name="modalForm" >
+         <div id="modalProblemDivision" name="modalProblemDivision">
+            <table id="modalProblemTable" name="modalProblemTable" class="table">
+  
+            </table>
+         </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Select</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="modal fade" id="descriptionModal" tabindex="-1" aria-labelledby="descriptionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="descriptionModalLabel">Description</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form>
+        <div id="description"></div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      <button type="button" class="btn btn-primary">Select</button>
+    </div>
+  </div>
+</div>
+</div>
+
+
+
+<div class="modal fade" id="leaderboardModal" tabindex="-1" aria-labelledby="leaderboardModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="leaderboardModalLabel"><i class="fa fa-trophy"></i>&nbsp;&nbsp;LeaderBoard</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form>
+        <div id="leaderboard">
+          <table class="table table-dark" id="leaderboardTable" name="leaderboardTable">
+          </table>
+          
+                 </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+
+
+
+
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand">
+        <h4>
+        <i class="fa fa-desktop"></i>&nbsp;
+        Codify</h4></a>
+        <form class="form-inline">
+            <div class="container-fluid">
+              <div class="dropdown">
+
+                  <button type="button" id="themeButton" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
+                    <i class="fa fa-cog" aria-hidden="true" style="font-size: 24px;"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item" onclick="changeTheme('ambiance')">ambiance</a>
+                      <a class="dropdown-item" onclick="changeTheme('chaos')">chaos</a>
+                      <a class="dropdown-item" onclick="changeTheme('chrome')">chrome</a>
+                      <a class="dropdown-item" onclick="changeTheme('cloud')">cloud</a>
+                      <a class="dropdown-item" onclick="changeTheme('cobalt')">cobalt</a>
+                      <a class="dropdown-item" onclick="changeTheme('dawn')">dawn</a>
+                      <a class="dropdown-item" onclick="changeTheme('dracula')">dracula</a>
+                      <a class="dropdown-item" onclick="changeTheme('merbivore')">merbivore</a>
+                      <a class="dropdown-item" onclick="changeTheme('monokai')">monokai</a>
+                      <a class="dropdown-item" onclick="changeTheme('vibrant_ink')">vibrant_ink</a>
+                      <a class="dropdown-item" onclick="changeTheme('tomorrow_night')">tomorrow_night</a>
+
+                    </div>
+                  </div>
+              &nbsp;
+
+
+<div class="dropdown">
+
+    <button type="button" id="languageButton" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+        Language
+      </button>
+      <div class="dropdown-menu">
+        <a class="dropdown-item" onclick="changeLanguage('C++')">C++</a>
+        <a class="dropdown-item"  onclick="changeLanguage('C')">C</a>
+        <a class="dropdown-item"  onclick="changeLanguage('Java')">Java</a>
+        <a class="dropdown-item"  onclick="changeLanguage('Python')">Python</a>
+      </div>
+    </div>
+    &nbsp;
+    <div class="dropdown">
+ 
+        <button type="button" id="problemsButton" class="btn btn-info" onclick="popupModal()">Problems</button>
+        </div>
+  
+        &nbsp;
+    
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <label class="badge badge-warning">Compile With Inputs</label>
+            &nbsp;&nbsp;
+                <div class="input-group-text">
+                    <b style="color:black;">yes</b>&nbsp;
+            <input type="radio" name="inputRadio" id="inputRadio" onclick="changeInputRadio(this.value)" value="true" aria-label="Radio button for following text input">
+          </div>
+          <div class="input-group-text">
+            <b style="color:black;">no</b>&nbsp;
+    <input type="radio" name="inputRadio" id="inputRadio" onclick="changeInputRadio(this.value)" value="false" aria-label="Radio button for following text input">
+  </div>
+        </div>
+      </div>
+      &nbsp;&nbsp;
+
+    
+    <textarea style="width: 380px;" rows="2"  id="customField" name="customField" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" placeholder="Enter custom Inputs" disabled></textarea>&nbsp;&nbsp;
+    <a class="btn btn-primary" onclick="openLeaderboardModal()" style="cursor: pointer;"><i class="fa fa-trophy" style="font-size: 20px;"></i></a>&nbsp;&nbsp;
+    <button style="cursor: pointer;" class="btn btn-danger" onclick="logout()"><i class="fa fa-sign-out" style="font-size: 20px;"></i></button>&nbsp;&nbsp;
+   <i class="fa fa-user-circle-o" style="color: whitesmoke;font-size: 18px;"></i>&nbsp;<span id="uname" style="color: whitesmoke;font-size: 16px;"></span
+
+ 
+        </div>
+
+        </form>
+        </nav>
+        
+<form id="myform" name="myform" action="" method="POST">
+    
+<div class="flex-container">
+<div id="editor" class="flex-child" style="overflow: auto;">
+    //Start Typing Your Code Here...
+</div>
+<div>
+<div id="editorx" class="flex-child" style="overflow-y: auto;" aria-readonly="true">
+</div>
+<div class="card" style="height: 210px;">
+    <textarea class="card-body" rows="3" id="stdout" name="stdout" style="height:70px;background-color: white;border:none;overflow: auto;" readonly>
+      StdOut
+    </textarea>
+    <div class="card">
+    <div class="card-body" id="result" name="result" style="height: 90px;overflow-x: auto;">
+        Result
+    </div>
+    </div>
+    <span style="padding-left: 530px;height: 40px;border: none;">
+      <button type="button" class="btn btn-danger" onclick="runCode()">Run</button>&nbsp;&nbsp;
+    <button type="button" class="btn btn-success" onclick="submitCode()">Submit</button>
+    </span>
+  </div>
+
+  
+</div>
+</form>
+<div id="divToTransparent" name="divToTransparent">
+<div id="wheelDiv" name="wheelDiv"></div>
+</div>
+<script>
+var lang="c_cpp";
+var language="C++";
+var theme="merbivore";
+var firstTime=0;
+var editor = ace.edit("editor");
+var editorx=ace.edit("editorx");
+var hasSession=false;
+var username="";
+function changeLanguage(lng)
+{
+if(lng!=undefined && (lng!="C" && lng!="C++"))
+{
+language=lng;
+lang=lng.toLowerCase();
+}
+if(lng!=undefined && (lng=="C" || lng=="C++"))
+{
+language=lng;
+lang="c_cpp";
+}
+if(language!="Python")
+{
+editor.setValue("//Start writting your code here..",0);
+}
+else
+{
+editor.setValue("#Start writting your code here..",0);
+}
+$.ajax({
+type:'GET',
+url:'getSession',
+async:false,
+success:function(res){
+hasSession=res.success;
+username=res.name;
+},
+error:function(){
+hasSession=false;
+}
+});
+if(!hasSession){
+  window.location="http://localhost:8080/login";
+  return;
+}
+document.getElementById("uname").innerHTML=username;
+if(firstTime==0){
+  alert("Welcome "+username); 
+firstTime+=1;
+}
+document.getElementById("languageButton").textContent=language;
+editor.setTheme("ace/theme/"+theme);
+editor.getSession().setMode("ace/mode/"+lang);
+editor.getSession().setTabSize(1);
+editor.renderer.setShowGutter(true);
+editorx.setTheme("ace/theme/x-code");
+editorx.setReadOnly(true);
+editorx.setOptions({
+fontFamily:"tahoma",
+fontSize:"12pt"
+});
+editorx.renderer.setShowGutter(false);
+
+}
+</script>
+</body>
+</html>

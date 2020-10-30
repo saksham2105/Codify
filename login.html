@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Login</title>
+	<meta charset="UTF-8">
+	<style>
+:root {
+  --input-padding-x: 1.5rem;
+  --input-padding-y: .75rem;
+}
+
+body {
+  background: #007bff;
+  background: linear-gradient(to right, #0062E6, #33AEFF);
+}
+
+.card-signin {
+  border: 0;
+  border-radius: 1rem;
+  box-shadow: 0 0.5rem 1rem 0 rgba(0, 0, 0, 0.1);
+}
+
+.card-signin .card-title {
+  margin-bottom: 2rem;
+  font-weight: 300;
+  font-size: 1.5rem;
+}
+
+.card-signin .card-body {
+  padding: 2rem;
+}
+
+.form-signin {
+  width: 100%;
+}
+
+.form-signin .btn {
+  font-size: 80%;
+  border-radius: 5rem;
+  letter-spacing: .1rem;
+  font-weight: bold;
+  padding: 1rem;
+  transition: all 0.2s;
+}
+
+.form-label-group {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.form-label-group input {
+  height: auto;
+  border-radius: 2rem;
+}
+
+.form-label-group>input,
+.form-label-group>label {
+  padding: var(--input-padding-y) var(--input-padding-x);
+}
+
+.form-label-group>label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  margin-bottom: 0;
+  /* Override default `<label>` margin */
+  line-height: 1.5;
+  color: #495057;
+  border: 1px solid transparent;
+  border-radius: .25rem;
+  transition: all .1s ease-in-out;
+}
+
+.form-label-group input::-webkit-input-placeholder {
+  color: transparent;
+}
+
+.form-label-group input:-ms-input-placeholder {
+  color: transparent;
+}
+
+.form-label-group input::-ms-input-placeholder {
+  color: transparent;
+}
+
+.form-label-group input::-moz-placeholder {
+  color: transparent;
+}
+
+.form-label-group input::placeholder {
+  color: transparent;
+}
+
+.form-label-group input:not(:placeholder-shown) {
+  padding-top: calc(var(--input-padding-y) + var(--input-padding-y) * (2 / 3));
+  padding-bottom: calc(var(--input-padding-y) / 3);
+}
+
+.form-label-group input:not(:placeholder-shown)~label {
+  padding-top: calc(var(--input-padding-y) / 3);
+  padding-bottom: calc(var(--input-padding-y) / 3);
+  font-size: 12px;
+  color: #777;
+}
+
+.btn-google {
+  color: white;
+  background-color: #ea4335;
+}
+
+.btn-facebook {
+  color: white;
+  background-color: #3b5998;
+}
+
+/* Fallback for Edge
+-------------------------------------------------- */
+
+@supports (-ms-ime-align: auto) {
+  .form-label-group>label {
+    display: none;
+  }
+  .form-label-group input::-ms-input-placeholder {
+    color: #777;
+  }
+}
+
+/* Fallback for IE
+-------------------------------------------------- */
+
+@media all and (-ms-high-contrast: none),
+(-ms-high-contrast: active) {
+  .form-label-group>label {
+    display: none;
+  }
+  .form-label-group input:-ms-input-placeholder {
+    color: #777;
+  }
+}
+
+	</style>
+	    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+		<!------ Include the above in your HEAD tag ---------->
+<script>
+	function checkBeforeLogin()
+	{
+	var username=document.getElementById("username").value;
+	var password=document.getElementById("password").value;
+	var flag=false;
+	var validLogin=false;
+	var exist=true;
+	var msg="";
+	if(username.trim()=="" || username==null || username.trim().length==0)
+	{
+	flag=true;
+	document.getElementById("unDiv").setAttribute("style","border:1px solid red");
+	}
+	if(password.trim()=="" || password==null || password.trim().length==0)
+	{
+	flag=true;
+	document.getElementById("pwdDiv").setAttribute("style","border:1px solid red");
+	}
+	if(flag) return;
+	$.ajax({
+	type:'POST',
+	url:'exist',
+	async:false,
+	data:{"username":username},
+	success:function(res){
+    exist=res.success;
+	},
+	error:function(){
+   alert("error");
+	}
+   });
+  if(!exist)
+  {
+	  alert("un does not exist");
+	  document.getElementById("username").value="";
+	document.getElementById("password").value="";
+
+	document.getElementById("content").innerHTML="Username/Email does not exist";
+	document.getElementById("content").style.color="red";
+	$("#myModal").show("modal");
+	return;
+  }
+	$.ajax({
+	type:'POST',
+	url:'validLogin',
+	async:false,
+	data:{"username":username,"password":password},
+	success:function(res){
+		validLogin=res.success;
+	},
+	error:function(){
+   alert("error");
+	}
+   });
+
+   if(!validLogin)
+   {
+	alert("un and pwd doesn't match");
+	document.getElementById("username").value="";
+	document.getElementById("password").value="";
+	document.getElementById("content").innerHTML="Username and password doesn't match";
+	document.getElementById("content").style.color="red";
+	$("#myModal").show("modal");
+	return;
+
+   }
+   
+   else
+   {
+	var pp=false;
+   $.ajax({
+	type:'POST',
+	url:'createSession',
+	async:false,
+	data:{"username":username},
+	success:function(res)
+	{
+	pp=res.success;
+	msg=res.message;
+	},
+	error:function(){
+
+	}
+   });
+  if(pp)
+  {
+window.location="http://localhost:8080/home";
+return;
+  }
+  else{
+    alert(msg);
+	document.getElementById("content").innerHTML=msg;
+	document.getElementById("content").style.color="red";
+	$("#myModal").show("modal");
+	return;
+  
+  }
+   }
+	}
+	function changeType()
+	{
+	var type=document.getElementById('password').getAttribute("type");
+	if(type=="password")
+	{
+	document.getElementById('password').setAttribute("type","text");
+	}
+	else
+	{
+	document.getElementById('password').setAttribute("type","password");
+    }
+	}
+
+
+	function openForgotModal()
+	{
+	$("#forgotModal").modal("show");
+	}
+
+	function changePassword()
+	{
+		var username=document.getElementById("uusername").value;
+		var newpassword=document.getElementById("newpassword").value;
+		var f=false;
+		if(username==null || username.trim().length==0 || username.trim=="")
+		{
+		f=true;
+		document.getElementById("uunDiv").setAttribute("style","border:1px solid red");
+		}
+		if(newpassword==null || newpassword.trim().length==0 || newpassword.trim=="")
+		{
+		f=true;
+		document.getElementById("npwdDiv").setAttribute("style","border:1px solid red");
+		}
+		if(f) return;
+		var exist=false;
+		$.ajax({
+	type:'POST',
+	url:'exist',
+	async:false,
+	data:{"username":username},
+	success:function(res){
+    exist=res.success;
+	},
+	error:function(){
+   alert("error");
+	}
+   });
+   if(exist==false)
+   {
+	document.getElementById("uusername").value="";
+	document.getElementById("newpassword").value="";
+	alert("Username Not Found");
+	return;
+   }
+
+   else
+   {
+	var flag=false;
+    var msg="";
+	$.ajax({
+	type:'POST',
+	url:'updatePassword',
+	async:false,
+	data:{"username":username,"newpassword":newpassword},
+	success:function(res){
+	flag=res.success;
+	msg=res.message;
+	},
+	error:function(){
+   alert("error");
+	}
+   });
+   alert(msg);
+   document.getElementById("uusername").value="";
+	document.getElementById("newpassword").value="";
+   window.location="http://localhost:8080/login";
+   }
+	}
+</script>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+		  <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+			<div class="card card-signin my-5">
+			  <div class="card-body">
+				<h3 class="card-title text-center" style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;"><b><i class="fa fa-desktop"></i>&nbsp;Codify</b></h3>
+				<form class="form-signin">
+				  <div class="form-label-group" id="unDiv" name="unDiv">
+					<input type="text" id="username" name="username" class="form-control" placeholder="UserName/Email" onkeydown="document.getElementById('unDiv').removeAttribute('style','border:1px solid red')" required>
+					<label for="username">UserName/Email</label>
+				  </div>
+
+				  <div class="form-label-group" id="pwdDiv" name="pwdDiv">
+					<input type="password" id="password" name="password" class="form-control" placeholder="Password" onkeydown="document.getElementById('pwdDiv').removeAttribute('style','border:1px solid red')" required>
+					<label for="password">Password <a onclick="changeType()" style="cursor: pointer;"><i class="fa fa-eye" style="float: right;"></i></a>
+					</label>
+				  </div>
+		   <center><button type="button" class="btn btn-danger btn-lg" onclick="checkBeforeLogin()">Sign in</button></center>
+		  <center><a style="cursor: pointer;" href="http://localhost:8080/register" style="padding-left: 100px;">Don't have an account?</a></center>
+		  <center><a style="cursor: pointer;color: blue;" onclick="openForgotModal()" style="padding-left: 100px;">Forgot Password?</a></center>
+				</form>
+			  </div>
+			</div>
+		  </div>
+		</div>
+	  </div>
+
+
+
+	  <div class="modal fade" id="forgotModal" tabindex="-1" aria-labelledby="forgotModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-scrollable">
+			<div class="modal-content">
+		  <div class="modal-header">
+			<h5 class="modal-title" id="forgotModalLabel"><i class="fa fa-desktop"></i> Codify</h5>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			  <span aria-hidden="true">&times;</span>
+			</button>
+		  </div>
+		  <div class="modal-body">
+		 <div id="forgotPassword" name="forgotPassword">
+					<div class="card card-signin my-5">
+					  <div class="card-body">
+						<h3 class="card-title text-center" style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;"><b><i class="fa fa-desktop"></i>&nbsp;&nbsp; Codify</b></h3>
+						  <div class="form-label-group" id="uunDiv" name="uunDiv">
+							<input type="text" id="uusername" name="uusername" class="form-control" placeholder="UserName/Email" onkeydown="document.getElementById('uunDiv').removeAttribute('style','border:1px solid red')" required>
+							<label for="uusername">UserName/Email</label>
+						  </div>
+		
+						  
+						  <div class="form-label-group" id="npwdDiv" name="npwdDiv">
+							<input type="password" id="newpassword" name="newpassword" class="form-control" placeholder="New Password" onkeydown="document.getElementById('npwdDiv').removeAttribute('style','border:1px solid red')" required>
+							<label for="newpassword">New Password 
+							</label>
+						  </div>
+		
+				   <center><button type="button" class="btn btn-danger btn-lg" onclick="changePassword()">Change Password</button></center>
+					  </div>
+					</div>
+				  
+		
+		
+
+
+
+
+		 </div>
+           
+
+
+
+
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+
+		  </div>
+		</div>
+	  </div>
+	  </div>
+	  
+
+
+	  <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="descriptionModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-scrollable">
+			<div class="modal-content">
+		  <div class="modal-header">
+			<h5 class="modal-title" id="descriptionModalLabel">Let's Code</h5>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			  <span aria-hidden="true">&times;</span>
+			</button>
+		  </div>
+		  <div class="modal-body">
+			  <div id="content">
+
+			  </div>
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+
+		  </div>
+		</div>
+	  </div>
+	  </div>
+	  
+	
+</body>
+</html>

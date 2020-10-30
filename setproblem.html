@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Set Problem</title>
+	<meta charset="UTF-8">
+	    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script>
+        function setProblem()
+        {
+        var name=document.getElementById("name").value;
+        var description=document.getElementById("description").value;
+        var tcases=document.getElementById("testcases").value;
+        var eoutput=document.getElementById("expectedoutput").value;
+        var obj1=JSON.parse(tcases);
+        var obj2=JSON.parse(eoutput);
+        var testcases=new Array();
+        var expectedoutput=new Array();
+        for(var i=0;i<obj1.length;i++)
+        {
+        testcases.push(obj1[i]);
+        }
+        for(var i=0;i<obj2.length;i++)
+        {
+        expectedoutput.push(obj2[i]);
+        }
+        console.log(typeof(testcases));
+        console.log(typeof(expectedoutput));
+        for(var i=0;i<testcases.length;i++) console.log(testcases[i].testcase);
+        for(var i=0;i<expectedoutput.length;i++) console.log(expectedoutput[i].output);
+        var flag=false;
+        var message="";
+        $.ajax({
+        type:'POST',
+        url:'setProblem',
+        async:false,
+        data:{"name":name,"description":description,"testcases":testcases,"expectedoutput":expectedoutput},
+        success:function(res)
+        {
+        flag=res.success;
+        message=res.message;
+        },
+        error:function(){
+
+        }
+        });
+        alert(message);
+        return;
+        }
+        </script>
+</head>
+<body>
+        <div class="container">
+            <center>
+              <i class="fa fa-desktop"></i>&nbsp;Codify
+            <h3>Set Problem</h3>
+        <div class="form-group">
+          <input type="text" id="name" name="name" class="form-control"  placeholder="Problem Name">
+        </div>
+        <div class="form-group">
+          <textarea id="description" name="description" class="form-control" rows="5" placeholder="Description"></textarea>
+        </div>
+        <div class="form-group">
+          <textarea id="testcases" name="testcases" class="form-control" rows="5" placeholder="Write Your Testcases"></textarea>
+        </div>
+        <div class="form-group">
+          <textarea id="expectedoutput" name="expectedoutput" class="form-control" rows="5" placeholder="Expected Output"></textarea>
+        </div>
+
+      </center>
+
+        <center><button class="btn btn-primary" onclick="setProblem()">Set</button></center>
+        </div>
+</body>
+</html>
