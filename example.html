@@ -82,8 +82,183 @@
     margin-right: 1px;
 }
 
+
+.modal.left .modal-dialog,
+.modal.right .modal-dialog,
+.modal.top .modal-dialog,
+.modal.bottom .modal-dialog {
+  -webkit-transform: translate3d(0%, 0, 0);
+  -ms-transform: translate3d(0%, 0, 0);
+  -o-transform: translate3d(0%, 0, 0);
+  transform: translate3d(0%, 0, 0);
+}
+
+/* Left & Right */
+
+.modal.left .modal-dialog,
+.modal.right .modal-dialog {
+  position: fixed;
+  margin: auto;
+  width: 500px;
+  max-width: 100%;
+  height: 100%;
+}
+
+.modal.left .modal-content,
+.modal.right .modal-content {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.modal.left .modal-body,
+.modal.right .modal-body {
+  padding: 15px 15px 80px;
+}
+
+.modal.left.fade .modal-dialog {
+  left: -500px;
+  -webkit-transition: opacity 0.3s linear, left 0.3s ease-out;
+  -moz-transition: opacity 0.3s linear, left 0.3s ease-out;
+  -o-transition: opacity 0.3s linear, left 0.3s ease-out;
+  transition: opacity 0.3s linear, left 0.3s ease-out;
+}
+
+.modal.left.fade.show .modal-dialog {
+  left: 0;
+}
+
+.modal.right.fade .modal-dialog {
+  right: -500px;
+  -webkit-transition: opacity 0.3s linear, right 0.3s ease-out;
+  -moz-transition: opacity 0.3s linear, right 0.3s ease-out;
+  -o-transition: opacity 0.3s linear, right 0.3s ease-out;
+  transition: opacity 0.3s linear, right 0.3s ease-out;
+}
+
+.modal.right.fade.show .modal-dialog {
+  right: 0;
+}
+
+.modal.left .modal-content,
+.modal.right .modal-content,
+.modal.top .modal-content,
+.modal.bottom .modal-content,
+.modal.full .modal-content {
+  border-radius: 0;
+  border: none;
+}
+
+.modal.left .modal-dialog.modal-sm,
+.modal.right .modal-dialog.modal-sm {
+  width: 300px;
+}
+
+.modal.left .modal-dialog.modal-lg,
+.modal.right .modal-dialog.modal-lg {
+  width: 800px;
+}
+
+.modal.left .modal-dialog.modal-xl,
+.modal.right .modal-dialog.modal-xl {
+  width: 1140px;
+}
+
+/* Top and Bottom */
+
+.modal.top .modal-dialog,
+.modal.bottom .modal-dialog {
+  position: fixed;
+  margin: auto;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+
+.modal.top .modal-content,
+.modal.bottom .modal-content {
+  height: auto;
+  overflow-y: auto;
+}
+
+.modal.top .modal-body,
+.modal.bottom .modal-body {
+  padding: 15px 15px;
+}
+
+/* Top */
+
+.modal.top.fade .modal-dialog {
+  top: -100%;
+  -webkit-transition: opacity 0.3s linear, top 0.3s ease-out;
+  -moz-transition: opacity 0.3s linear, top 0.3s ease-out;
+  -o-transition: opacity 0.3s linear, top 0.3s ease-out;
+  transition: opacity 0.3s linear, top 0.3s ease-out;
+}
+
+.modal.top.fade.show .modal-dialog {
+  top: 0;
+}
+
+/* Bottom */
+
+.modal.bottom.fade .modal-dialog {
+  bottom: -100%;
+  -webkit-transition: opacity 0.3s linear, bottom 0.3s ease-out;
+  -moz-transition: opacity 0.3s linear, bottom 0.3s ease-out;
+  -o-transition: opacity 0.3s linear, bottom 0.3s ease-out;
+  transition: opacity 0.3s linear, bottom 0.3s ease-out;
+}
+
+.modal.bottom.fade.show .modal-dialog {
+  bottom: 0;
+}
+
+.modal.bottom.fade .modal-dialog {
+  bottom: -100%;
+}
+
+/* Full Screen */
+
+.modal.full .modal-dialog {
+  position: fixed;
+  margin: auto;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+}
+
+.modal.full .modal-content {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.modal.full .close-modal {
+  position: fixed;
+  top: 0;
+  right: 3rem;
+}
+
+/* Footer */
+
+.modal-footer-fixed {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #fff;
+  border-radius: 0;
+}
+
+/* XS */
+
+.modal.left.xs .modal-body,
+.modal.right.xs .modal-body {
+  padding: 15px;
+}
+
+
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -130,6 +305,30 @@
     function openProblem(problem,i,problemId)
     {
       selectedProblemId=problemId;
+      var hasCodeFor=false;
+      var code;
+      //code to check whether record of code exist or not;
+       $.ajax({
+        type:'POST',
+        url:'hasCodeFor',
+        async:false,
+        data:{username:username,pid:selectedProblemId,language:language},
+        success:function(res){
+        hasCodeFor=res.success;
+        code=res.message[0].code;
+        },
+        error:function(){
+
+        }
+       });
+       if(hasCodeFor)
+       {
+       editor.setValue(code,-1);
+       }
+      else
+      {
+      editor.setValue("",-1);
+      }
       var string="Problem Name : "+problem;
       string+="\n\n";
       var dsc="Description : "+globalDescs[i];
@@ -242,15 +441,82 @@
     function stopSubmitTransparency()
     {
     submitCount=0;
+    var hasCodeFor=false;
+    var hasPlagiarism=false;
     document.getElementById("divToTransparent").removeAttribute("class","loading style-2");
     document.getElementById("wheelDiv").removeAttribute("class","loading-wheel");
+    $.ajax({
+    type:'POST',
+    url:'getSimilarityScore',
+    async:false,
+    data:{username:username,pid:selectedProblemId,language:language,code:editor.getValue()},
+    success:function(res){
+      hasPlagiarism=res.success;
+    },
+    error:function(){
+
+    }
+    });
+    if(hasPlagiarism)
+    {
+    togglePlagiarismModal();
+    }
+
+    $.ajax({
+      type:'POST',
+      url:'hasCodeFor',
+      async:false,
+      data:{username:username,pid:selectedProblemId,language:language},
+      success:function(res){
+      hasCodeFor=res.success;
+      code=res.message[0].code;
+      },
+      error:function()
+      {}
+      });
+      if(hasCodeFor==false)
+      {
+      $.ajax({
+      type:'POST',
+      url:'addCode',
+      async:false,
+      data:{username:username,pid:selectedProblemId,language:language,code:editor.getValue()},
+      success:function(res)
+      {
+      },
+      error:function()
+      {
+
+      }
+      });
+      }
+      else
+      {
+      $.ajax({
+      type:'POST',
+      url:'updateCode',
+      async:false,
+      data:{username:username,pid:selectedProblemId,language:language,code:editor.getValue()},
+      success:function(res)
+      {
+      },
+      error:function()
+      {
+
+      }
+      });
+      
+
+      }
+     
+
     clearInterval(submitCodeTransparent);
     if(failedTestcases==0)
-   {
+    {
     document.getElementById("result").setAttribute("style","color:green;");
     document.getElementById("result").innerHTML="Success<br/>";
     document.getElementById("result").innerHTML+=`<div class="progress"><div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"><b>Congrats Your Problem has passed all the testcases</b></div></div>`;
-   }
+    }
    else
    {
     let testcasesPassed=totalTestcases-failedTestcases;
@@ -326,6 +592,7 @@
 
     });
   }
+ 
 
  
     }
@@ -341,15 +608,12 @@
     }
     function submitCode()
     {
+      //togglePlagiarismModal();
       failedTestcases=0;
       currentProblemOutput=[];
       var code=editor.getValue();
     var input=document.getElementById("customField").value;
     totalTestcases=currentProblemTestcase.length;
-    /*for(var test of currentProblemExpectedOutput)
-    {
-    console.log(JSON.stringify(test));
-    }*/
       if(currentProblemExpectedOutput.length==0) return;
       else
       {
@@ -446,6 +710,7 @@
     $.ajax({
     type:'POST',
     url:"compilecode",
+    async:false,
     data:{"code":code,"input":input,"inputRadio":inputRadio,"lang":language},
     success: function(res)
 	  {
@@ -468,10 +733,32 @@
     }
     });    
     }
+    function togglePlagiarismModal()
+    {
+    $("#right_modal_xs").modal("show");
+    }
 </script>
 </head>
 <body onload="changeLanguage()">
+    
+    <div class="modal right xs fade" id="right_modal_xs" tabindex="-1" role="dialog" aria-labelledby="top_modal">
+      <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content h-auto rounded-left">
+          <div class="modal-header">
+            <h5 style="padding-left: 80px;"><i class="fa fa-desktop"></i>&nbsp;Codify</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body text-center" id="plagiarismContent" name="plagiarismContent">
+          <b style="color:red";><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <b>Plagiarized Content</b></b>
+          </div>
+        </div>
+      </div>
+    </div>
+    
 
+  
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
@@ -657,12 +944,14 @@
 <div id="divToTransparent" name="divToTransparent">
 <div id="wheelDiv" name="wheelDiv"></div>
 </div>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
 <script>
 var lang="c_cpp";
 var language="C++";
 var theme="merbivore";
 var firstTime=0;
 var editor = ace.edit("editor");
+//editor.getEditor().commands.addCommand({name:'breakTheEditor',bindKey:'ctrl-c|ctrl-v|ctrl-x|ctrl-shift-v|shift-del|cmd-c|cmd-v|cmd-x',exec:function(){}});
 var editorx=ace.edit("editorx");
 var hasSession=false;
 var username="";
@@ -678,6 +967,26 @@ if(lng!=undefined && (lng=="C" || lng=="C++"))
 language=lng;
 lang="c_cpp";
 }
+var updated=false;
+$.ajax({
+type:'POST',
+url:'hasCodeFor',
+async:false,
+data:{username:username,pid:selectedProblemId,language:language},
+success:function(res){
+if(res.success==true)
+{
+updated=true;
+editor.setValue(res.message[0].code);
+}
+},
+error:function()
+{}
+});
+
+if(!updated)
+{
+
 if(language!="Python")
 {
 editor.setValue("//Start writting your code here..",0);
@@ -685,6 +994,7 @@ editor.setValue("//Start writting your code here..",0);
 else
 {
 editor.setValue("#Start writting your code here..",0);
+}
 }
 $.ajax({
 type:'GET',
