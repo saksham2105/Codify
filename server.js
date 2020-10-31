@@ -2,11 +2,13 @@ var express=require("express");
 var path=require("path");
 var fs=require("fs");
 var path=require("path");
+var similarity=require("similarity");
 var useModel=require("./modules/user");
 var probModel=require("./modules/problem");
 var chkModel=require("./modules/check");
 var scrModel=require("./modules/score");
-var session = require('express-session') 
+var cdeModel=require("./modules/code");
+var session = require('express-session'); 
 var app=express();
 var bodyParser=require("body-parser");
 app.use(bodyParser());
@@ -15,10 +17,12 @@ var compiler=require("compilex");
 const { exec } = require("child_process");
 const { collection } = require("./modules/user");
 const { Console } = require("console");
+const { type } = require("os");
 var user=useModel.find({});
 var problem=probModel.find({});
 var score=scrModel.find({});
 var check=chkModel.find({});
+var code=cdeModel.find({});
 var option={stats:true};
 compiler.init(option);
 
@@ -43,6 +47,122 @@ app.get("/getsession", function(req, res){
     //}) 
     
 }) */
+app.post('/getSimilarityScore',function(req,res){
+var username=req.body.username;
+var pid=req.body.pid;
+var language=req.body.language;
+var code=req.body.code;
+cdeModel.find({pid:pid,language:language},function(err,data){
+    var newarr=[];
+    for(var element of data){
+        if(element.username!=username) newarr.push(element);
+    }
+   var hasPlagiarism=false;
+   var similarityArray=[]
+   var similarityScore=0;
+   for(var e of newarr)
+   {
+    console.log("Similarity "+similarity(code,e.code));
+    if(similarity(code,e.code)>0.55)
+    {
+    similarityScore=similarity(code,e.code);
+    hasPlagiarism=true;
+    break;
+    }
+   }
+   var responseWrapper={};
+   if(hasPlagiarism)
+   {
+   responseWrapper.success=hasPlagiarism;
+   responseWrapper.message="has plagiarism";
+   responseWrapper.similarity=similarityScore;
+   }
+   else
+   {
+    responseWrapper.success=hasPlagiarism;
+    responseWrapper.message="no plagiarism detected";
+    responseWrapper.similarity=similarityScore;
+    }
+  res.send(responseWrapper);
+});
+});
+
+app.post('/hasCodeFor',function(req,res){
+var username=req.body.username;
+var pid=req.body.pid;
+var language=req.body.language;
+cdeModel.find({username:username,pid:pid,language:language},function(err,records){
+var responseWrapper={};
+if(records.length==0)
+{
+responseWrapper.success=false;
+responseWrapper.message="Code has not submitted for this problem";
+res.send(responseWrapper);
+}
+else
+{
+responseWrapper.success=true;
+responseWrapper.message=records;
+res.send(responseWrapper);
+}
+});
+});
+
+app.post('/addCode',function(req,res){
+var username=req.body.username;
+var pid=req.body.pid;
+var language=req.body.language;
+var code=req.body.code;
+var codeDetails=new cdeModel({
+username:username,
+pid:pid,
+language:language,
+code:code
+});
+codeDetails.save(function(err,res1){
+    var responseWrapper={};
+    if(err)
+    {
+    responseWrapper.success=false;
+    responseWrapper.message="some error";
+    res.send(responseWrapper);
+    return;
+    }
+    else
+    {
+    responseWrapper.success=true;
+    responseWrapper.message="Code has added successfully";
+    res.send(responseWrapper);
+    return;
+    }
+  
+});
+});
+
+app.post('/updateCode',function(req,res){
+var username=req.body.username;
+var pid=req.body.pid;
+var language=req.body.language;
+var code=req.body.code;
+cdeModel.update({username:username,pid:pid,language:language},{code:code},function(err,affetcted,raw){
+var responseWrapper={};
+if(err)
+{
+responseWrapper.success=false;
+responseWrapper.message=err;
+res.send(responseWrapper);
+return;
+}
+else
+{
+responseWrapper.success=true;
+responseWrapper.message="Code has changed successfully";
+res.send(responseWrapper);
+return;
+}
+});    
+});
+ 
 
 app.post('/hasProblemSolvedByUser',function(req,res){
 var pid=req.body.pid;
@@ -287,10 +407,6 @@ res.send(responseWrapper);
 return;
 }
 });
-});
-
-app.get('/kalu',function(re,res){
-res.sendfile("index.html");
 });
 
 app.get('/getProblems',function(req,res){
