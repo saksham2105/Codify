@@ -31,6 +31,6 @@ Tools and Technologies Used
 ---
 
 ## Tools and Technologies Used 
-Front End:Html,JavaScript,Ace JS(Plugin for theme and code editor(Check https://ace.c9.io/)).
-Back End :Express JS(Server),Compilex Framework(Code Checker in JS),MongoDB and Mongoose(to Store Data in JSON Format)
+* Front End:Html,JavaScript,Ace JS(Plugin for theme and code editor(Check https://ace.c9.io/)).
+* Back End :Express JS(Server),Compilex Framework(Code Checker in JS),MongoDB and Mongoose(to Store Data in JSON Format)
      
