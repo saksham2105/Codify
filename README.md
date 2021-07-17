@@ -19,9 +19,9 @@ Back End :Express JS(Server),Compilex Framework(Code Checker in JS),MongoDB and 
 * Start Express Server for this type node server.js in terminal(server.js contains code of express server) for this type node server.js or nodemon whatever
 
 Some important Urls that you can type in your broswer to do specific tasks related to specific activities:
-* http://localhost:8080/ or http://localhost:8080/login(login with codify platform)
-* http://localhost:8080/register(to register with codify platform)
-* http://localhost:8080/openProblemSetter(to set any problem)
+* http://localhost:8080/ or http://localhost:8080/login (login with codify platform)
+* http://localhost:8080/register (to register with codify platform)
+* http://localhost:8080/openProblemSetter (to set any problem)
 * http://localhost:8080/home (Main Page of Codify remember any single can't directly use this url first he has to logged in)
 
 
