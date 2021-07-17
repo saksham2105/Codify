@@ -9,6 +9,7 @@ to his Program output he/she will be rewarded with some points if his/her progra
 *Code will be loaded into database whenever user will submit their code.
 * There is a module for plagiarism detection whenever user copy someones code among different users,User will be warned with "Plagiarized Content Message";
 Tools and Technologies Used 
+* A User can login as a Problem Setter to Set any Problem with different Testcases and Problem Description and Explanation
 
 ## Tools and Technologies Used 
 Front End:Html,JavaScript,Ace JS(Plugin for theme and code editor(Check https://ace.c9.io/)).
