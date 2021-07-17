@@ -4,7 +4,7 @@
 
 
 ### Video Preview
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/boER86GimaA/0.jpg)](https://www.youtube.com/watch?v=boER86GimaA)
+[![IMAGE ALT TEXT HERE](https://i9.ytimg.com/vi/boER86GimaA/maxresdefault.jpg?time=1626516600000&sqp=CPjYyocG&rs=AOn4CLBYKua1RSb3frl-WficrNSEyPreWw)](https://www.youtube.com/watch?v=boER86GimaA)
 
 ----
 
