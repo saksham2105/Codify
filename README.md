@@ -1,6 +1,6 @@
-![GitHub stars](https://img.shields.io/github/stars/rajaprerak/movie_recommender) 
-[![Maintenance](https://img.shields.io/badge/maintained-yes-green.svg)](https://github.com/rajaprerak/movie_recommender/commits/master)
-[![Website shields.io](https://img.shields.io/badge/website-up-yellow)](https://awesome-movie-recommender.herokuapp.com/)
+![GitHub stars](https://img.shields.io/github/stars/saksham2105/codify) 
+[![Maintenance](https://img.shields.io/badge/maintained-yes-green.svg)](https://github.com/saksham2105/codify/commits/master)
+[![Website shields.io](https://img.shields.io/badge/website-up-yellow)]()
 
 
 ### Video Preview
