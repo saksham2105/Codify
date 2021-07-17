@@ -1,29 +1,36 @@
-## About
-Codify is an Online Competetitive Coding Platform.It Provides List of Algorithmic Challenges.A User has to some Predefined testcases regarding any problem and according 
-to his Program output he/she will be rewarded with some points if his/her program passes all the required testcases for a particular challenge.
+![GitHub stars](https://img.shields.io/github/stars/rajaprerak/movie_recommender) 
+[![Maintenance](https://img.shields.io/badge/maintained-yes-green.svg)](https://github.com/rajaprerak/movie_recommender/commits/master)
+[![Website shields.io](https://img.shields.io/badge/website-up-yellow)](https://awesome-movie-recommender.herokuapp.com/)
 
-## Features 
 
-* User can see their score on the leaderboard and Unlock and view any code challenge
+### Video Preview
+<iframe width="560" height="315" src="https://www.youtube.com/embed/boER86GimaA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+----
+
+#### Clone
+
+- Clone this repo to your local machine.
+
+#### Run server locally
+
+```shell
+$ node server.js
+```
+> Go to localhost:8080
+
+---
+## Features 📋
+* User can register and login.
+* User can Solve multiple Problems.
+* User can see their score on the leaderboard and Unlock and view any code challenge.
 * A user can also change the theme of Code Editor and Editor will highlight the code syntax for a selected programming language.
 *Code will be loaded into database whenever user will submit their code.
 * There is a module for plagiarism detection whenever user copy someones code among different users,User will be warned with "Plagiarized Content Message";
 Tools and Technologies Used 
 * A User can login as a Problem Setter to Set any Problem with different Testcases and Problem Description and Explanation
+---
 
 ## Tools and Technologies Used 
 Front End:Html,JavaScript,Ace JS(Plugin for theme and code editor(Check https://ace.c9.io/)).
 Back End :Express JS(Server),Compilex Framework(Code Checker in JS),MongoDB and Mongoose(to Store Data in JSON Format)
-
-## How To Use
-*Install Necessary Packages like fn,path,body-parser,mongoose,mongodb,express,compilex,similarity(used for plagiarism detection using text similarity),express-session Using npm(node package manager) tool.
-* Start Express Server for this type node server.js in terminal(server.js contains code of express server) for this type node server.js or nodemon whatever
-
-Some important Urls that you can type in your broswer to do specific tasks related to specific activities:
-* http://localhost:8080/ or http://localhost:8080/login (login with codify platform)
-* http://localhost:8080/register (to register with codify platform)
-* http://localhost:8080/openProblemSetter (to set any problem)
-* http://localhost:8080/home (Main Page of Codify remember any single can't directly use this url first he has to logged in)
-
-
-[Demo](https://youtu.be/boER86GimaA)
+     
