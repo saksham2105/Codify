@@ -6,6 +6,8 @@
 ### Video Preview
 [![IMAGE ALT TEXT HERE](https://i9.ytimg.com/vi/boER86GimaA/maxresdefault.jpg?time=1626516600000&sqp=CPjYyocG&rs=AOn4CLBYKua1RSb3frl-WficrNSEyPreWw)](https://www.youtube.com/watch?v=boER86GimaA)
 
+   ![partial_search](https://github.com/saksham2105/Codify/blob/main/demoscreenshots/home.png)
+
 ----
 
 #### Clone
